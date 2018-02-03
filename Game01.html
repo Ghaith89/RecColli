@@ -1,0 +1,192 @@
+<html>
+	<head>
+		<h1>Game</h1>
+		<style>
+			canvas{
+				border: 1px solid black;
+				width: 100%;
+			}
+			
+		</style>
+	</head>
+	<canvas width = "500" height="300" id = "myCanvas"></canvas>
+	
+
+	<body>
+		
+		<script>
+			window.addEventListener("load", function(){
+			
+			
+				var canvas = document.getElementById("myCanvas");
+				var ctx = canvas.getContext("2d");
+				
+				var Game_Width = 500;
+				var Game_Height = 300;
+				
+				ctx.fillStyle = "rgb(200, 0, 200)";
+				ctx.fillRect(50, 40, 100, 30);
+			//Motion Varriables
+				var gameLive = true;
+			
+				var enemies = [
+					{
+						x:100, 
+						y:100, 
+						speedY:2,
+						w:40,
+						h:40,
+					},
+					{
+						x:140, 
+						y:120, 
+						speedY:1,
+						w:40,
+						h:40,
+					},
+					{
+						x:200, 
+						y:100, 
+						speedY:2,
+						w:40,
+						h:40,
+					},
+					{
+						x:120, 
+						y:50, 
+						speedY:2,
+						w:40,
+						h:40,
+					},
+				];
+				
+					
+				
+				var player = {
+					x: 0,
+					y: 120,
+					speedX: 2,
+					w: 40,
+					h: 40,
+					isMoving: false
+				};
+				
+				var Goal = {
+					x: 460,
+					y: 120,
+					w: 20,
+					h: 50
+				};
+					
+				
+				//Make The Player Moving
+				
+				var movePlayer = function(){
+					player.isMoving = true;
+				};
+				
+				var stopPlayer = function(){
+					player.isMoving = false;
+				};
+				
+				canvas.addEventListener("mousedown", movePlayer);
+				canvas.addEventListener("mouseup", stopPlayer);
+				
+				var x = 10;
+				var y = 10;
+				var w = 20;
+				var h = 30;
+				
+				var speed = 2;
+				
+				var update = function(){
+					if(player.isMoving)
+					{
+						player.x += player.speedX;
+					}
+					
+					
+					var n = enemies.length;
+					var j = 0;
+					x = x+ speed;
+					
+					enemies.forEach(function (element, index)
+					{
+						//ColisionAction
+						if(CollisionCheck(player, element)){
+							gameLive = false;
+							//Stop Game
+							alert("Game Over");
+							//Reload Page
+							window.location = "";
+						}
+						
+						element.y += element.speedY;
+						
+						if(element.y <= 1){
+							element.y = 1;
+							element.speedY *= -1;
+						}
+							else if(element.y >= Game_Height -40){
+								element.y = Game_Height -40;
+								element.speedY *= -1;
+							}
+						if(CollisionCheck(Goal, element)){
+							alert("You \'ve won !");;
+						}
+						
+					});
+					
+				};
+				
+				
+				
+				var CollisionCheck = function (rect01, rect02)
+				{
+					var closeOnWidth = Math.abs(rect01.x-rect02.x)<= Math.max(rect01.w, rect02.w);
+					var closeOnHeight = Math.abs(rect01.y-rect02.y)<= Math.max(rect01.h, rect02.h);
+					
+					return closeOnHeight && closeOnWidth;
+				}
+					
+				
+				
+				var draw = function(){
+				
+					var n = enemies.length;
+					var j = 0;
+					ctx.clearRect(0, 0, Game_Width, Game_Height);
+					ctx.fillStyle = "rgb(200, 0, 100)";
+					
+					//Draw Goal
+					ctx.fillStyle = "#5F9EA0";
+					ctx.fillRect(Goal.x, Goal.y, Goal.w, Goal.h);
+					
+					//draw player
+					ctx.fillStyle = "#00FF00";
+					ctx.fillRect(player.x, player.y, player.w, player.h);
+					
+					//Draw enemies
+					ctx.fillStyle = "#3333FF";
+					enemies.forEach(function(element, index){
+						ctx.fillRect(element.x, element.y, element.w, element.h);
+					})
+					
+					while(j<n){
+					ctx.fillRect(enemies[j].x, enemies[j].y, enemies[j].w, enemies[j].h);
+					j++;
+
+				}
+				};
+					//Call both draw and update functions with in the animation
+				var step = function(){
+					update();
+					draw();
+					window.requestAnimationFrame(step);
+				};
+				
+				step();
+				})
+		</script>
+	</body>
+</html>
